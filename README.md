@@ -48,15 +48,15 @@ Agent Harness = Tools + Knowledge + Observation + Action + Permissions
 
 | 组件 | Claude Code | Codex | OpenCode |
 |------|------------|-------|----------|
-| **Tools** | 41 个工具 | 42 个处理器 | 18 个工具 |
+| **Tools** | 40 个工具 | 42 个处理器 | 18 个工具 |
 | **Knowledge** | CLAUDE.md + Skill + MCP + Memory | AGENTS.md + memories 扩展 | AGENTS.md |
 | **Observation** | Git diff、文件系统、终端、浏览器 | 文件系统、终端、Git | 文件系统、终端 |
 | **Action** | CLI、API、文件、Git、团队协作 | Shell、文件、MCP | Shell、文件 |
 | **Permissions** | 3 种模式 + 工具级权限 + Hook | permissions.toml + 请求审批 | 基本权限 |
 | **Context 管理** | 5 层压缩体系 | 2 层压缩体系 | 1 层压缩体系 |
 | **多代理** | AgentTool + TeamCreate | agent_jobs + 层级代理 | 无 |
-| **记忆系统** | Session Memory + 文件记忆 | memories 扩展（19 个文件） | 无 |
-| **技能系统** | SkillTool | 无 | skill 工具 |
+| **记忆系统** | Session Memory + 文件记忆 | memories 扩展（26 个文件） | 无 |
+| **技能系统** | SkillTool | skills + core-skills | skill 工具 |
 
 ---
 
@@ -200,7 +200,7 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 
 ### 5.1 工具系统
 
-#### Claude Code（41 个工具）
+#### Claude Code（40 个工具）
 
 | 类别 | 工具 |
 |------|------|
@@ -217,7 +217,7 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 | 配置 | ConfigTool |
 | 定时任务 | ScheduleCronTool（CronCreate、CronDelete、CronList） |
 | 用户交互 | AskUserQuestionTool |
-| 其他 | BriefTool、SleepTool、SyntheticOutputTool、TodoWriteTool |
+| 其他 | BriefTool、SleepTool、SyntheticOutputTool、TodoWriteTool、RemoteTriggerTool |
 | MCP | MCPTool、ListMcpResourcesTool、ReadMcpResourceTool、McpAuthTool |
 | LSP | LSPTool |
 
@@ -232,6 +232,7 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 | MCP | mcp、mcp_resource、read_mcp_resource、list_mcp_resources |
 | 用户交互 | request_user_input、request_permissions |
 | 插件 | request_plugin_install、list_available_plugins_to_install |
+| 技能 | 5 个内置技能（imagegen、openai-docs、plugin-creator、skill-creator、skill-installer）+ core-skills 框架 |
 | 搜索 | tool_search |
 | 其他 | plan、send_message、send_input、view_image、write_stdin |
 
@@ -424,11 +425,11 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 - System Prompt: `codex-rs/prompts/src/*.rs`（28,064 bytes，排除 tests）
 - Compact: `codex-rs/core/src/compact.rs`
 - Auto Compact Window: `codex-rs/core/src/state/auto_compact_window.rs`
-- Memories: `codex-rs/ext/memories/`（19 个 .rs 文件）
+- Memories: `codex-rs/ext/memories/`（26 个 .rs 文件）
 
 #### OpenCode
 - System Prompt: `packages/opencode/src/session/prompt/default.txt`（8,623 bytes）
-- Tool 定义: `packages/opencode/src/tool/*.txt`（15,285 bytes）
+- Tool 定义: `packages/opencode/src/tool/*.txt`（16,575 bytes）
 - Compaction: `packages/opencode/src/session/compaction.ts`（640 行）
 
 ### C. 术语表

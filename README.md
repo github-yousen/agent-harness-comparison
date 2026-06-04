@@ -3,7 +3,6 @@
 ## Claude Code vs Codex vs OpenCode 深度对比
 
 > 评审日期：2026-06-05
-> 修订日期：2026-06-05（经源码审核修正）
 > 评审范围：Agent Harness 架构、Token 消耗、上下文管理、能力评估
 
 ---
@@ -12,11 +11,11 @@
 
 ### 1.1 版本与来源
 
-| 项目 | 来源仓库 | 版本/状态 | 语言 | 获取时间 |
-|------|---------|----------|------|---------|
-| **Claude Code** | [chauncygu/collection-claude-code-source-code](https://github.com/chauncygu/collection-claude-code-source-code) | v2.1.88（2026-03-31 泄露） | TypeScript | 2026-06-04 |
-| **Codex** | [openai/codex](https://github.com/openai/codex) | 最新 main 分支 | Rust + TypeScript | 2026-06-04 |
-| **OpenCode** | [anomalyco/opencode](https://github.com/anomalyco/opencode) | 最新 main 分支 | TypeScript + Go | 2026-06-04 |
+| 项目 | 来源仓库 | 版本/状态 | 语言 |
+|------|---------|----------|------|
+| **Claude Code** | [chauncygu/collection-claude-code-source-code](https://github.com/chauncygu/collection-claude-code-source-code) | v2.1.88（2026-03-31 泄露） | TypeScript |
+| **Codex** | [openai/codex](https://github.com/openai/codex) | 最新 main 分支 | Rust |
+| **OpenCode** | [anomalyco/opencode](https://github.com/anomalyco/opencode) | 最新 main 分支 | TypeScript |
 
 ### 1.2 项目背景
 
@@ -49,14 +48,14 @@ Agent Harness = Tools + Knowledge + Observation + Action + Permissions
 
 | 组件 | Claude Code | Codex | OpenCode |
 |------|------------|-------|----------|
-| **Tools** | 41 个工具 | ~48 个处理器 | 17 个工具 |
-| **Knowledge** | CLAUDE.md + Skill + MCP + Memory | AGENTS.md + 外部配置 + memories | AGENTS.md |
+| **Tools** | 41 个工具 | 42 个处理器 | 18 个工具 |
+| **Knowledge** | CLAUDE.md + Skill + MCP + Memory | AGENTS.md + memories 扩展 | AGENTS.md |
 | **Observation** | Git diff、文件系统、终端、浏览器 | 文件系统、终端、Git | 文件系统、终端 |
 | **Action** | CLI、API、文件、Git、团队协作 | Shell、文件、MCP | Shell、文件 |
 | **Permissions** | 3 种模式 + 工具级权限 + Hook | permissions.toml + 请求审批 | 基本权限 |
 | **Context 管理** | 5 层压缩体系 | 2 层压缩体系 | 1 层压缩体系 |
 | **多代理** | AgentTool + TeamCreate | agent_jobs + 层级代理 | 无 |
-| **记忆系统** | Session Memory + 文件记忆 | memories 扩展（4 个工具） | 无 |
+| **记忆系统** | Session Memory + 文件记忆 | memories 扩展（19 个文件） | 无 |
 | **技能系统** | SkillTool | 无 | skill 工具 |
 
 ---
@@ -71,33 +70,33 @@ Agent Harness = Tools + Knowledge + Observation + Action + Permissions
 
 | 项目 | 文件 | 大小 | 估算 Token 数 |
 |------|------|------|--------------|
-| **Claude Code** | `src/constants/prompts.ts` | ~55KB | ~15,000 |
-| **Codex** | `codex-rs/prompts/src/*.rs`（含 tests）| ~53KB（排除 tests 约 28KB） | ~8,000 |
-| **OpenCode** | `packages/opencode/src/session/prompt/default.txt` | ~9KB | ~2,500 |
+| **Claude Code** | `src/constants/prompts.ts` | 55,234 bytes | ~15,700 |
+| **Codex** | `codex-rs/prompts/src/*.rs`（排除 tests） | 28,064 bytes | ~8,000 |
+| **OpenCode** | `packages/opencode/src/session/prompt/default.txt` | 8,623 bytes | ~2,400 |
 
 ### 3.3 Tool 定义大小
 
 | 项目 | 工具数 | 大小 | 估算 Token 数 |
 |------|-------|------|--------------|
-| **Claude Code** | 41 个 | ~136KB（tool prompts） | ~38,000 |
-| **Codex** | ~48 个 | 集成在 system prompt 中 | ~15,000 |
-| **OpenCode** | 17 个（真正工具） | ~15KB（tool txt files） | ~4,000 |
+| **Claude Code** | 41 个 | 135,716 bytes（tool prompts） | ~38,700 |
+| **Codex** | 42 个 | 集成在 system prompt 中 | ~15,000 |
+| **OpenCode** | 18 个 | 15,285 bytes（tool txt files） | ~4,300 |
 
 ### 3.4 总 Token 消耗估算
 
 | 项目 | System Prompt | Tool 定义 | 消息开销 | **总计** |
 |------|--------------|----------|---------|---------|
-| **Claude Code** | ~15,000 | ~38,000 | ~500 | **~53,500** |
+| **Claude Code** | ~15,700 | ~38,700 | ~500 | **~54,900** |
 | **Codex** | ~8,000 | ~15,000 | ~500 | **~23,500** |
-| **OpenCode** | ~2,500 | ~4,000 | ~300 | **~6,800** |
+| **OpenCode** | ~2,400 | ~4,300 | ~300 | **~7,000** |
 
 ### 3.5 Token 效率排名
 
 | 排名 | 项目 | Token 消耗 | 评价 |
 |------|------|-----------|------|
-| 🥇 1 | **OpenCode** | ~6,800 | 最省 token，轻量级设计 |
+| 🥇 1 | **OpenCode** | ~7,000 | 最省 token，轻量级设计 |
 | 🥈 2 | **Codex** | ~23,500 | 中等消耗，功能丰富 |
-| 🥉 3 | **Claude Code** | ~53,500 | 最高消耗，功能最全 |
+| 🥉 3 | **Claude Code** | ~54,900 | 最高消耗，功能最全 |
 
 ---
 
@@ -222,7 +221,7 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 | MCP | MCPTool、ListMcpResourcesTool、ReadMcpResourceTool、McpAuthTool |
 | LSP | LSPTool |
 
-#### Codex（~48 个处理器）
+#### Codex（42 个处理器）
 
 | 类别 | 工具 |
 |------|------|
@@ -236,7 +235,7 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 | 搜索 | tool_search |
 | 其他 | plan、send_message、send_input、view_image、write_stdin |
 
-#### OpenCode（17 个工具）
+#### OpenCode（18 个工具）
 
 | 类别 | 工具 |
 |------|------|
@@ -382,7 +381,7 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 
 1. **Claude Code 的上下文管理是碾压级的**：5 层压缩体系（Micro → Session Memory → Auto → Reactive → Context Collapse）远超其他两个项目
 2. **Codex 的多代理能力最强**：agent_jobs 系统支持批量生成、CSV 导入，适合大规模代理协作
-3. **OpenCode 最省 token**：约 6,800 tokens，是 Claude Code 的 1/8，适合简单任务
+3. **OpenCode 最省 token**：约 7,000 tokens，是 Claude Code 的 1/8，适合简单任务
 4. **三者都有上下文管理**：Claude Code 5 层 > Codex 2 层 > OpenCode 1 层
 
 ### 8.2 技术趋势
@@ -408,28 +407,29 @@ MAX_PRESERVE_RECENT_TOKENS = 8,000
 | Claude Code 源码 | `chauncygu/collection-claude-code-source-code` 仓库 `original-source-code/` 目录 |
 | Codex 源码 | `openai/codex` 仓库 |
 | OpenCode 源码 | `anomalyco/opencode` 仓库 |
-| Token 估算 | 基于源码中的文件大小和内容分析 |
+| Token 估算 | 基于源码中的文件大小和内容分析（~3.5 bytes/token） |
 | 上下文管理分析 | 基于源码中的 compact 相关文件 |
 
 ### B. 关键文件索引
 
 #### Claude Code
-- System Prompt: `src/constants/prompts.ts`（55KB）
-- Tool 定义: `src/tools/*/prompt.ts`（136KB）
+- System Prompt: `src/constants/prompts.ts`（55,234 bytes）
+- Tool 定义: `src/tools/*/prompt.ts`（135,716 bytes）
 - AutoCompact: `src/services/compact/autoCompact.ts`
 - MicroCompact: `src/services/compact/microCompact.ts`
 - Session Memory: `src/services/compact/sessionMemoryCompact.ts`
 - 上下文窗口: `src/utils/context.ts`
 
 #### Codex
-- System Prompt: `codex-rs/prompts/src/*.rs`（53KB）
+- System Prompt: `codex-rs/prompts/src/*.rs`（28,064 bytes，排除 tests）
 - Compact: `codex-rs/core/src/compact.rs`
 - Auto Compact Window: `codex-rs/core/src/state/auto_compact_window.rs`
-- Permissions: `codex-rs/core/src/config/permissions.rs`
+- Memories: `codex-rs/ext/memories/`（19 个 .rs 文件）
 
 #### OpenCode
-- System Prompt: `packages/opencode/src/session/prompt/default.txt`（9KB）
-- Tool 定义: `packages/opencode/src/tool/*.txt`（17KB）
+- System Prompt: `packages/opencode/src/session/prompt/default.txt`（8,623 bytes）
+- Tool 定义: `packages/opencode/src/tool/*.txt`（15,285 bytes）
+- Compaction: `packages/opencode/src/session/compaction.ts`（640 行）
 
 ### C. 术语表
 
